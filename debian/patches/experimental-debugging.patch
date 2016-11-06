@@ -1,0 +1,107 @@
+--- a/incubator/net.sf.j2s.ui.cmdline/src/net/sf/j2s/ui/cmdline/JDTUtils.java
++++ b/incubator/net.sf.j2s.ui.cmdline/src/net/sf/j2s/ui/cmdline/JDTUtils.java
+@@ -23,6 +23,9 @@
+ import org.eclipse.core.resources.IncrementalProjectBuilder;
+ import org.eclipse.core.resources.ResourcesPlugin;
+ import org.eclipse.core.runtime.CoreException;
++import org.eclipse.core.runtime.NullProgressMonitor;
++import org.eclipse.core.runtime.IStatus;
++import org.eclipse.core.runtime.Status;
+ import org.eclipse.core.runtime.IPath;
+ import org.eclipse.core.runtime.Path;
+ import org.eclipse.debug.core.DebugPlugin;
+@@ -81,6 +84,43 @@
+ 		}
+ 		return project;			
+ 	}
++	
++	static class Monitor extends NullProgressMonitor {
++		private Thread t;
++		private boolean done = false;
++		private boolean interrupted = false;
++		public Monitor() {
++			t = new Thread(new Runnable() {
++				public void run() {
++					boolean myDone = false;
++					while (!myDone) {
++						try {
++							Thread.sleep(100);
++						} catch (InterruptedException e) {
++							synchronized(Monitor.this) {
++								interrupted = true;
++							}
++							break;
++						}
++						synchronized(Monitor.this) {
++							myDone = done;
++						}
++					}
++				}
++			});
++			t.start();
++		}
++		public synchronized void done() { done = true; }
++		public void join() throws CoreException {
++			try {
++				t.join();
++				synchronized (this) { if (interrupted) { throw new InterruptedException(); } }
++			} catch (InterruptedException e) {
++				IStatus s = new Status(IStatus.CANCEL, "net.sf.j2s.ui.cmdline", "interrupted", e);
++				throw new CoreException(s);
++			}
++		}
++	}
+ 
+ 	/**
+ 	 * import an existing eclipse project located at projectPath with the eclipse rpoject name 'name' in the workspace.
+@@ -146,10 +186,17 @@
+ 	 * @param params 
+ 	 */
+ 	public static void build(IProject project, Map<String, String> params) throws CoreException {
+-		project.touch(null);
+-		project.refreshLocal(IResource.DEPTH_INFINITE, null);
++		Monitor m = null;
++		m = new Monitor();
++		project.touch(m);
++		m.join();
++		m = new Monitor();
++		project.refreshLocal(IResource.DEPTH_INFINITE, m);
++		m.join();
++		m = new Monitor();
+ //		project.build(IncrementalProjectBuilder.CLEAN_BUILD, null);			
+-		project.build(IncrementalProjectBuilder.FULL_BUILD, null);
++		project.build(IncrementalProjectBuilder.FULL_BUILD, m);
++		m.join();
+ 		
+ 		//build problem report.
+ 		String problemsLog = params.get(Command.PROBLEMS_LOG);
+@@ -363,7 +410,7 @@
+ 	}
+ 	
+ 	private static void reportProjectErrors(IProject project, final File logFile)
+-	throws JavaModelException {
++	throws CoreException {
+ 		IJavaProject javaProject = JavaCore.create(project);
+ 		// create requestor for accumulating discovered problems
+ 		final IProblemRequestor problemRequestor = new IProblemRequestor() {
+@@ -401,7 +448,8 @@
+ 			for (int j = 0; j < units.length; j++) {
+ 				ICompilationUnit unit = units[j];
+ 				//getting a working copy passing the WorkingCopyOwner will feed the requestor with problems
+-				unit.getWorkingCopy(wCopyOwner, null);				
++				unit.getWorkingCopy(wCopyOwner, null);
++				unit.discardWorkingCopy();
+ 			}
+ 		}
+ 	}
+--- a/sources/net.sf.j2s.core/src/net/sf/j2s/core/builder/JavaBuilder.java
++++ b/sources/net.sf.j2s.core/src/net/sf/j2s/core/builder/JavaBuilder.java
+@@ -37,7 +37,7 @@
+ String[] extraResourceFolderFilters;
+ public static final String SOURCE_ID = "JDT"; //$NON-NLS-1$
+ 
+-public static boolean DEBUG = false;
++public static boolean DEBUG = true;
+ public static boolean SHOW_STATS = false;
+ 
+ /**

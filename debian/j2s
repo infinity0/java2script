@@ -1,0 +1,24 @@
+#!/bin/sh
+ECLIPSE=eclipse
+
+if [ -n "$ECLIPSE_TMP_AREA" ]; then
+# If this is set, we assume you want to do an automated build.
+# So we set a bunch of extra options that are needed to make this work:
+ECLIPSE_OPTS="$ECLIPSE_OPTS \
+-configuration '$ECLIPSE_TMP_AREA/configuration' \
+-user '$ECLIPSE_TMP_AREA' \
+-data '$ECLIPSE_TMP_AREA' \
+-clean"
+# The below alias works around two separate bugs:
+# https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=842190
+# https://github.com/zhourenjian/java2script/issues/7
+if [ -n "$DISPLAY" ]; then
+ECLIPSE="/usr/lib/eclipse/eclipse"
+else
+ECLIPSE="xvfb-run /usr/lib/eclipse/eclipse"
+fi
+fi
+
+exec sh -c \
+"exec $ECLIPSE -nosplash ${ECLIPSE_OPTS} -application net.sf.j2s.ui.cmdlineApi "'$@' \
+eclipse "$@"

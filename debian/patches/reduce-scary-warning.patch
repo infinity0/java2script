@@ -1,0 +1,11 @@
+--- a/incubator/net.sf.j2s.ui.cmdline/src/net/sf/j2s/ui/cmdline/JDTUtils.java
++++ b/incubator/net.sf.j2s.ui.cmdline/src/net/sf/j2s/ui/cmdline/JDTUtils.java
+@@ -348,7 +348,7 @@
+ 			
+ 	private static String toString(IProblem problem) {				
+ 		return 
+-			"BUILD ERROR: message: "+problem.getMessage()+
++			"build problem: "+problem.getMessage()+
+ 			", arguments: " +Utils.toString(problem.getArguments())+
+ 			", filename: "+new String(problem.getOriginatingFileName())+			
+ 			"\n";

@@ -1,0 +1,12 @@
+java2script for Debian
+---------------------
+
+<this file describes information about the source package, see Debian policy
+manual section 4.14. You WILL either need to modify or delete this file>
+
+TODO: build docbook, in incubator/net.sf.j2s.user-guide. needs docbook-xml and docbook-xsl
+TODO: figure out what to do with j2slib https://github.com/zhourenjian/java2script/issues/8
+TODO: cmdlineApi exits 0 if the thing segfaults! Probably a JVM problem. Add a check to j2s script for this.
+
+
+ -- Ximin Luo <infinity0@debian.org>  Wed, 26 Oct 2016 18:20:54 +0200

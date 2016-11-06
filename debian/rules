@@ -1,0 +1,51 @@
+#!/usr/bin/make -f
+# See debhelper(7) (uncomment to enable)
+# output every command that modifies files on the build system.
+#export DH_VERBOSE = 1
+
+
+# see FEATURE AREAS in dpkg-buildflags(1)
+#export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+
+# see ENVIRONMENT in dpkg-buildflags(1)
+# package maintainers to append CFLAGS
+#export DEB_CFLAGS_MAINT_APPEND  = -Wall -pedantic
+# package maintainers to append LDFLAGS
+#export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+
+CONFIGURE_FLAGS = -DforceContextQualifier=dist \
+  -Dplugin.path=/usr/lib/eclipse:/usr/share/eclipse/dropins/jdt
+
+%:
+	dh $@
+
+override_dh_auto_build:
+	mkdir -p incubator/net.sf.j2s.ui.template.velocity/lib
+	ln -sf /usr/share/java/velocity.jar \
+	  incubator/net.sf.j2s.ui.template.velocity/lib/velocity-1.6.4-dep.jar
+	mkdir -p sources/net.sf.j2s.ajax/lib/
+	ln -sf /usr/share/java/servlet-api-3.1.jar \
+	  sources/net.sf.j2s.ajax/lib/javax.servlet_2.5.0.v200910301333.jar
+# PATH hack is to work around bug #842190
+	PATH=/usr/lib/eclipse:$$PATH xvfb-run dh_auto_build -- CONFIGURE_FLAGS="$(CONFIGURE_FLAGS)"
+
+TEST_J2S = ECLIPSE_TMP_AREA=$$PWD/debian/test-tmp debian/j2s
+override_dh_auto_test:
+	rm -rf debian/test-tmp
+# Eclipse has "special" requirements on how you need to initialise a new area
+# for it to be able to read the plugins that have been installed into it.
+	$(MAKE) DESTDIR=debian/test-tmp eclipsedir= install-plugins
+	mkdir -p debian/test-tmp/features
+	touch debian/test-tmp/artifacts.xml
+	ECLIPSE_OPTS="$(ECLIPSE_OPTS) -initialize" $(TEST_J2S)
+	# The "Premature end of file" error above can be ignored.
+	$(TEST_J2S) -cmd build -path $$PWD/tests/net.sf.j2s.test.ajax
+
+override_dh_auto_install:
+	dh_auto_install -- prefix=/usr
+	mkdir -p debian/java2script/usr/lib/eclipse/plugins
+	cd debian/java2script/usr/lib/eclipse/plugins && \
+	for i in ../../../share/eclipse/plugins/*.jar; do \
+		ln -sf "$$i" "$$(basename "$$i")"; \
+	done

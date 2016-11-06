@@ -1,0 +1,6 @@
+reduce-scary-warning.patch
+0001-Add-a-Makefile-to-auto-build-everything-in-a-headles.patch
+0002-Work-around-a-JDK-segfault.patch
+0003-Enable-disable-the-correct-build-commands.patch
+0004-Properly-fail-the-whole-build-if-there-was-an-error.patch
+#experimental-debugging.patch

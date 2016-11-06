@@ -1,0 +1,5 @@
+java2script (2.0.0-3.8+git20150412+ds-1) unstable; urgency=medium
+
+  * Initial release (Closes: #nnnn)  <nnnn is the bug number of your ITP>
+
+ -- Ximin Luo <infinity0@debian.org>  Wed, 26 Oct 2016 18:20:54 +0200

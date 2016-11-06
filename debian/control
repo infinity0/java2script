@@ -1,0 +1,36 @@
+Source: java2script
+Section: unknown
+Priority: optional
+Maintainer: Ximin Luo <infinity0@debian.org>
+Build-Depends: debhelper (>= 9),
+ default-jdk-headless,
+ eclipse-jdt (>= 3.8), eclipse-jdt (<< 3.9),
+ eclipse-pde (>= 3.8), eclipse-pde (<< 3.9),
+ eclipse-rcp (>= 3.8), eclipse-rcp (<< 3.9),
+ liboro-java,
+ libservlet3.1-java,
+ velocity,
+ xauth,
+ xvfb,
+ zip
+Standards-Version: 3.9.8
+Homepage: https://sourceforge.net/projects/j2s/
+Vcs-Git: https://anonscm.debian.org/git/pkg-java/java2script.git/
+Vcs-Browser: https://anonscm.debian.org/cgit/pkg-java/java2script.git/
+
+Package: java2script
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends},
+ eclipse-jdt (>= 3.8), eclipse-jdt (<< 3.9),
+ eclipse-rcp (>= 3.8), eclipse-rcp (<< 3.9),
+ liboro-java,
+ libservlet3.1-java,
+ velocity
+Suggests: xauth, xvfb
+Description: Eclipse Java to JavaScript compiler plugin
+ Java2Script(J2S) provides an Eclipse Java to JavaScript compiler plugin and a
+ JavaScript version of Eclipse SWT besides common utilities like java.lang.*
+ and java.util.*. SWT-based RCP can be converted into RIA by using J2S.
+ .
+ This package contains the Eclipse plugins as well as a command-line script to
+ run automated builds with.

@@ -1,0 +1,8 @@
+version=4
+opts=\
+downloadurlmangle=s/\.zip$/.tar.gz/,\
+filenamemangle=s/.*\/(.*?)\.zip$/$1.tar.gz/,\
+uversionmangle=s/(.*)/2.0.0-$1+gitFIXMEDATE+ds/,\
+dversionmangle=s/\+ds\d*$// \
+https://github.com/zhourenjian/java2script/tree/j2s-eclipse-3.8 \
+  .*/j2s-eclipse-(3.8).zip

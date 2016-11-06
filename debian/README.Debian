@@ -1,0 +1,18 @@
+java2script for Debian
+----------------------
+
+TODO: move this to the manpage.
+
+The command-line API of j2s needs absolute paths. If you get errors like:
+
+$ j2s -cmd build -path XXX/YYY
+[..]
+Contains: 'XXX/YYY' is not a valid location. The location is relative to undefined workspace path variable 'XXX'.
+
+then try using $PWD/XXX/YYY instead.
+
+If you're using /usr/bin/j2s as part of an automated build process, you
+probably want to set the ECLIPSE_TMP_AREA environment variable to avoid
+clobbering your default user workspace / configuration files.
+
+ -- Ximin Luo <infinity0@debian.org>  Wed, 26 Oct 2016 18:20:54 +0200
